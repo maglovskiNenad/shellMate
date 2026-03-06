@@ -2,5 +2,24 @@
 
 app_name="shallMate"
 
-zenity --info --title="$app_name" --text="Radi li ovo cudo " --width=300 --height=100
+while true;do
+    choice=$(zenity \
+    --list \
+    --title="$app_name" \
+    --text="Izaberi opciju" \
+    --cancel-label="Exit" \
+    --width=520 --height=400 \
+    --column="Akcija" "System info" "Disk" "Control") || break
 
+    case "$choice" in
+        "System info")
+            echo "neka komanda"
+        ;;
+        "Disk")
+            echo "neka komanda"
+        ;;
+        "Control")
+            echo "neka komanda"
+        ;;
+    esac
+done
