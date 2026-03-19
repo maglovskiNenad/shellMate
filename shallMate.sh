@@ -66,10 +66,6 @@ show_system_info() {
 # -----------------------------
 # KREIRANJE KORISNIKA 
 # -----------------------------
-# TODO:
-# - Kreiranje korisnika novog korssnika
-# - Upisivanje i memorisanje podataka korisnika
-# - Odredjivanje grupe pripadanja korisniku kao i njegove premise
 create_user_form(){
     local user_data new_user full_name shell_choice
 
