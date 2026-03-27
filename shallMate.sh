@@ -1,47 +1,5 @@
 #!/usr/bin/env bash
 
-# ----------------------------
-# PODESAVANJE ZA LOGIN
-# ----------------------------
-
-APP_USER="$USER"
-APP_PASS="1234"
-
-# ----------------------------
-# LOGIN PROZOR
-# ----------------------------
-
-show_login() {
-    local login_data username password
-
-    login_data=$(zenity --forms \
-        --title="Login" \
-        --text="Unesi korisnicke podatke" \
-        --add-entry="Username" \
-        --add-password="Password" \
-        --width=350)
-
-    #U sliucaju ako je korisnik kliknuo "cancel" ili zatvorio prozor
-    if [ $? -ne 0 ]; then
-        exit 0
-    fi
-
-    username=$(echo "$login_data" | cut -d '|' -f1)
-    password=$(echo "$login_data" | cut -d '|' -f2)
-
-    if [[ "$username" == "$APP_USER" && "$password" == "$APP_PASS" ]]; then
-        zenity --info \
-            --title="Uspesno logovanje" \
-            --text="Dobrodosao, $username!"
-        return 0
-    else
-        zenity --error \
-            --title="Greska" \
-            --text="Pogresan username ili password."
-        return 1
-    fi
-}
-
 # -----------------------------
 # SYSTEM INFO
 # -----------------------------
@@ -49,11 +7,14 @@ show_system_info() {
     local info
 
     info=$(
-        echo "=== UNAME -A ==="
-        uname -a
+        echo "=== SYSTEM INFORMATION ==="
+        hostnamectl 
         echo
-        echo "=== LLSBLK ==="
+        echo "=== LIST BLOCK DEVICES ==="
         lsblk
+        echo 
+        echo "=== REPORT FILE SYSTEM SPACE USAGE ==="
+        df -h
     )
 
     zenity --text-info \
@@ -96,45 +57,36 @@ create_user_form(){
 # -----------------------------
 # GLAVNI MENI
 # -----------------------------
-app_name="shallMate"
 
 main_menu() {
-    while true;do
-        choice=$(zenity --list \
-        --title="Glavni meni aplikacije" \
-        --text="Izaberi opciju:" \
-        --radiolist \
-        --column="Izaberi" \
-        --column="Opcija" \
-        TRUE "System info" \
-        FALSE "Kreiraj korisnika" \
-        FALSE "Izlaz" \
+    choice=$(zenity --list \
+        --title="shallMate" \
+        --width=700 \
+        --height=500 \
+        --column="Options" \
+        "System info" \
+        "Status" \
+        "Disk" \
+        --ok-label="Ok" \
         --cancel-label="Exit" \
-        --width=820 \
-        --height=400 ) || break
+        )
+    
+    # U slucaju zatvaranja prozora
+    if [ $? -ne 0 ]; then
+        exit 0
+    fi
 
-        # U slucaju zatvaranja prozora
-        if [ $? -ne 0 ]; then
-            break
-        fi
-
-        case "$choice" in
-            "System info")
-                show_system_info
+    case "$choice" in
+        "System info")
+            show_system_info
             ;;
-            "Kreiraj korisnika")
-                create_user_form
+        "Users")
+            create_user_form
             ;;
-            "Izlaz")
-                break
-                ;;
-            *)
-                zenity --warning --text="Nije izabrana valida opcija."
-                ;;
-        esac
-    done
-
-
+        "Izlaz")
+            exit 0
+            ;;
+    esac
 }
 
 # -----------------------------
@@ -142,8 +94,5 @@ main_menu() {
 # -----------------------------
 
 while true; do
-    if show_login; then
-        main_menu
-        break
-    fi
+    main_menu
 done
