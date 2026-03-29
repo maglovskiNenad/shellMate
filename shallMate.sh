@@ -1,27 +1,22 @@
 #!/usr/bin/env bash
 
 # -----------------------------
-# SYSTEM INFO
+# SHOW_INFO
 # -----------------------------
-show_system_info() {
-    local info
 
-    info=$(
-        echo "=== SYSTEM INFORMATION ==="
-        hostnamectl 
-        echo
-        echo "=== LIST BLOCK DEVICES ==="
-        lsblk
-        echo 
-        echo "=== REPORT FILE SYSTEM SPACE USAGE ==="
-        df -h
-    )
+show_info() {
+    local title="$1"
+    shift
+    local content
+
+
+    content=$("$@")
 
     zenity --text-info \
-        --title="System info" \
+        --title="$title" \
         --width=800 \
         --height=500 \
-        --filename=<(echo "$info")
+        --filename=<(echo "$content")
 }
 
 # -----------------------------
@@ -64,8 +59,8 @@ main_menu() {
         --width=700 \
         --height=500 \
         --column="Options" \
+        "Information" \
         "System info" \
-        "Status" \
         "Disk" \
         --ok-label="Ok" \
         --cancel-label="Exit" \
@@ -77,11 +72,14 @@ main_menu() {
     fi
 
     case "$choice" in
-        "System info")
-            show_system_info
+        "Information")
+            show_info "Information" hostnamectl
             ;;
-        "Users")
-            create_user_form
+        "System info")
+            show_info "System info" systemctl status
+            ;;
+        "Disk")
+            show_info "Disk" df -h
             ;;
         "Izlaz")
             exit 0
